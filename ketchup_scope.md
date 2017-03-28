@@ -1,0 +1,12 @@
+# Ketchup (pomodoro timer) Spec
+- A pomodoro timer which will function as an active timer and a scheduling tool...
+- A pomodoro timer is a functional split/interval timer. The user defines the intervals and how often they repeat.
+- So at a minumum, we need the following data:
+  - Pomodoro time
+  - short break time
+  - long break time
+  - number of pomodoros
+- When all of the above is collected, do:
+  - Display amount of work & rest time
+  - Total length of session
+  - Execute timer (special pause feature, offset? total time distracted?)
