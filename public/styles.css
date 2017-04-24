@@ -1,0 +1,97 @@
+body {
+	margin: 0;
+	min-height: 100vh;
+}
+.ketchup {
+	min-height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	transition: background-color 400ms ease-out; 
+}
+.ketchup.work { background: url(concrete_seamless.png) #f44336; }
+.ketchup.break { background: url(concrete_seamless.png) #ffd54f; }
+.ketchup.rest { background: url(concrete_seamless.png) #81d4fa; }
+.ketchup-timer {
+	position: relative;
+	background-color: transparent;
+	width: 515px;
+	height: 90px;
+	margin: 40px 0 0 40px;
+	border-radius: 5px;
+	text-align: center;
+	border: 4px solid #131313;
+	box-shadow: -4px 4px 2px rgba(0,90,130,0.25),
+							inset -4px 4px 2px rgba(0,90,130,0.25);
+	font-family: 'Jura';
+	z-index: 1;
+}
+.ketchup-timer_time {
+	position: absolute;
+	top: 2px;
+	left: 10px;
+	margin: 0;
+	font-size: 98px;
+	line-height: 88px;
+	margin: 0;
+	color: #131313;
+	text-shadow: -3px 3px 2px rgba(0,90,130,0.25);
+}
+
+.global_light {
+	box-shadow: -3px 3px 2px rgba(0,90,130,0.25);
+}
+.ketchup-timer_title {
+	position: relative;
+	width: 520px;
+	margin: 5px 0 0 35px;
+	padding: 5px 7px;
+	border-radius: 5px 5px 0 0;
+	font-size: 12px;
+	line-height: 12px;
+	font-family: 'Jura';
+	color: #131313;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	text-shadow: -2px 2px 1px rgba(0,90,130,0.25);
+	font-weight: bolder;
+}
+.ketchup-timer_title span {
+	float: right;
+}
+.ketchup-timer_label {
+	position: absolute;
+	width: 75px;
+	right: 0;
+	display: inline-block;
+	text-align: center; 
+	font-weight: bolder;
+	text-shadow: -2px 2px 1px rgba(0,90,130,0.25);
+}
+.ketchup-timer_label.work { top: 11px; }
+.ketchup-timer_label.break { top: 29px; }
+.ketchup-timer_label.rest { top: 47px; }
+.ketchup-timer_label.left { top: 65px; }
+.ketchup-timer_label input {
+	width: 20px;
+	height: 16px;
+	position: absolute;
+	right: 0;
+	background-color: #131313; 
+	border: 0;
+	padding: 0 0 0 5px;
+	color: #aed581;
+	font-size: 14px;
+	font-family: 'Jura';
+	transition: color 400ms ease-out; 
+}
+.ketchup.work .ketchup-timer_label input { color: #f44336; }
+.ketchup.break .ketchup-timer_label input { color: #ffd54f; }
+.ketchup.rest .ketchup-timer_label input { color: #81d4fa; }
+
+input[type=number] { -moz-appearance: textfield; } 
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+	-webkit-appearance: none; 
+	margin: 0; 
+}

@@ -40,10 +40,8 @@ class KetchupTimer extends React.Component {
 
 	render() {
 
-		const phaseState = 0;
-
 		return (
-			<section className={"ketchup"}>
+			<section className="ketchup work">
 				<div>
 					<TimeDisplay />
 					<p className="ketchup-timer_title">ketchup timer <span>offbeat</span></p>
@@ -66,25 +64,26 @@ class TimeDisplay extends React.Component {
 } 
 
 class TimeControl extends React.Component {
+
 	render() {
 
 		return (
 			<div>
 				<label className="ketchup-timer_label work" title="work length in minutes">
 					W
-					<input class="global_light" type="number" min="0" max="99" value="99"></input>
+					<input className="global_light" type="number" min="0" max="99" defaultValue="99"></input>
 				</label>
 				<label className="ketchup-timer_label break" title="break length in minutes">
 					B
-					<input class="global_light" type="number" min="0" max="99" value="99"></input>
+					<input className="global_light" type="number" min="0" max="99" defaultValue="99"></input>
 				</label>
 				<label className="ketchup-timer_label rest" title="rest length in minutes">
 					R
-					<input class="global_light" type="number" min="0" max="99" value="99"></input>
+					<input className="global_light" type="number" min="0" max="99" defaultValue="99"></input>
 				</label>
 				<label className="ketchup-timer_label left" title="number of intervals remaining">
 					L
-					<input class="global_light" type="number" min="0" max="99" value="99"></input>
+					<input className="global_light" type="number" min="0" max="99" defaultValue="99"></input>
 				</label>
 			</div>
 		);
@@ -93,5 +92,5 @@ class TimeControl extends React.Component {
 
 ReactDOM.render(
 	<KetchupTimer />,
-	document.getElementById('root')
+	document.getElementById('ketchup')
 );
