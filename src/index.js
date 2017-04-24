@@ -8,6 +8,7 @@ class KetchupTimer extends React.Component {
 
 		// bind methods
 		this.tick = this.tick.bind(this);
+		// handleTimeControlChange
 
 		this.state = {
 			refTime: 0,
@@ -35,20 +36,31 @@ class KetchupTimer extends React.Component {
 
 	tick() {
 
-		// handle phase change
-
 		const t = Date.now(),
 					diff = (t - this.state.refTime),
 					timeRemaining = (this.state.timeRemaining - diff);
+		
+		// handle phase change
+		if (timeRemaining <= 0) {
+			// based on next phase type
+			// set timeRemaining to length in timeControls
+			// increment phaseCount
+			// decrement timeControls[3]
+		}
 
 		this.setState({
 			refTime: t,
 			timeRemaining: timeRemaining,
 			frameRequestID: requestAnimationFrame(this.tick)
+			// update phase count if changed above
 		});
 	}
 
+	// handle timeControl change
+
 	render() {
+
+		// set phase className based on phase count
 
 		return (
 			<section className="ketchup work">
@@ -83,6 +95,8 @@ class TimeControl extends React.Component {
 
 	render() {
 
+		// zero pad timeControl values
+
 		return (
 			<div>
 				<label className="ketchup-timer_label work" title="work length in minutes">
@@ -91,7 +105,7 @@ class TimeControl extends React.Component {
 								 type="number"
 								 min="0"
 								 max="99"
-								 defaultValue={this.props.timeControls[0]}></input>
+								 defaultValue={('00' + this.props.timeControls[0]).substr(-2)}></input>
 				</label>
 				<label className="ketchup-timer_label break" title="break length in minutes">
 					B
@@ -99,7 +113,7 @@ class TimeControl extends React.Component {
 								 type="number"
 								 min="0"
 								 max="99"
-								 defaultValue={this.props.timeControls[1]}></input>
+								 defaultValue={('00' + this.props.timeControls[1]).substr(-2)}></input>
 				</label>
 				<label className="ketchup-timer_label rest" title="rest length in minutes">
 					R
@@ -107,7 +121,7 @@ class TimeControl extends React.Component {
 								 type="number"
 								 min="0"
 								 max="99"
-								 defaultValue={this.props.timeControls[2]}></input>
+								 defaultValue={('00' + this.props.timeControls[2]).substr(-2)}></input>
 				</label>
 				<label className="ketchup-timer_label left" title="number of intervals remaining">
 					L
@@ -115,7 +129,7 @@ class TimeControl extends React.Component {
 								 type="number"
 								 min="0"
 								 max="99"
-								 defaultValue={this.props.timeControls[3]}></input>
+								 defaultValue={('00' + this.props.timeControls[3]).substr(-2)}></input>
 				</label>
 			</div>
 		);
