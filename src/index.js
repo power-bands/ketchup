@@ -10,55 +10,86 @@ class KetchupTimer extends React.Component {
 		this.tick = this.tick.bind(this);
 
 		this.state = {
-			minutes: 9,
-			seconds: 0,
-			milliseconds: 999
+			timeRemaining: null,
+			phaseCount: 0,
+			workLength: 30,
+			breakLength: 7,
+			restLength: 15,
+			intervalsRemaining: 16,
+			frameRequestID: 0
 		};
 	}
 
-	tick() {
-		const now = { ...this.state };
-
-		if (now.milliseconds === 0) {
-			this.setState({
-				seconds: now.seconds - 1,
-				milliseconds: 999
-			});
-			return;
-		} else if (now.seconds === 0) {
-			this.setState({
-				minutes: now.minutes - 1,
-				seconds: 59
-			});
-			return;
-		} else {
-			this.setState({
-				milliseconds: now.milliseconds - 1
-			});
-			return;
-		}
-
+	componentDidMount() {
+		this.setState({
+			timeRemaining: new Date(),
+			request: requestAnimationFrame(this.tick)
+		});
 	}
 
 	componentDidUpdate() {
 		// console.log(this.state.time.toString());
 	}
 
-	componentDidMount() {
-		window.setInterval(() => {
-			this.tick();
-		}, 1);
+	tick() {
+		this.setState({
+			timeRemaining: new Date(),
+			request: requestAnimationFrame(this.tick)
+		});
 	}
 
 	render() {
 
+		const phaseState = 0;
+
 		return (
-			<div>
-				<p>{this.state.minutes}:{this.state.seconds}:{this.state.milliseconds}</p>
-			</div>
+			<section className={"ketchup"}>
+				<div>
+					<TimeDisplay />
+					<p className="ketchup-timer_title">ketchup timer <span>offbeat</span></p>
+				</div>
+			</section>
 		);
 	}
 }
+
+class TimeDisplay extends React.Component {
+	render() {
+
+		return (
+			<div className="ketchup-timer">
+				<p className="ketchup-timer_time">00:00:000</p>
+				<TimeControl />
+			</div>
+		);
+	}
+} 
+
+class TimeControl extends React.Component {
+	render() {
+
+		return (
+			<div>
+				<label className="ketchup-timer_label work" title="work length in minutes">
+					W
+					<input class="global_light" type="number" min="0" max="99" value="99"></input>
+				</label>
+				<label className="ketchup-timer_label break" title="break length in minutes">
+					B
+					<input class="global_light" type="number" min="0" max="99" value="99"></input>
+				</label>
+				<label className="ketchup-timer_label rest" title="rest length in minutes">
+					R
+					<input class="global_light" type="number" min="0" max="99" value="99"></input>
+				</label>
+				<label className="ketchup-timer_label left" title="number of intervals remaining">
+					L
+					<input class="global_light" type="number" min="0" max="99" value="99"></input>
+				</label>
+			</div>
+		);
+	}
+} 
 
 ReactDOM.render(
 	<KetchupTimer />,
