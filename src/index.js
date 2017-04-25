@@ -1,6 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+function pickPhaseStateInstance(step) {
+	if (step === 1 || step % 2 === 1) return 0;
+	if (step % 2 === 0 && step % 8 !== 0) return 1;
+	if (step % 8 === 0) return 2;
+}
+
+const phaseNames = ['work','break','rest'];
+
 class KetchupTimer extends React.Component {
 
 	constructor(props) {
@@ -15,10 +23,10 @@ class KetchupTimer extends React.Component {
 			timeRemaining: 0,
 			phaseCount: 1,
 			timeControls: [
-				30,
-				7,
-				15,
-				16
+				1,
+				1,
+				1,
+				1
 			],
 			frameRequestID: 0
 		};
@@ -36,23 +44,38 @@ class KetchupTimer extends React.Component {
 
 	tick() {
 
-		const t = Date.now(),
+		let t = Date.now(),
 					diff = (t - this.state.refTime),
-					timeRemaining = (this.state.timeRemaining - diff);
+					timeRemaining = (this.state.timeRemaining - diff),
+					timeControls = [ ...this.state.timeControls ],
+					phaseCount = this.state.phaseCount;
 		
 		// handle phase change
 		if (timeRemaining <= 0) {
-			// based on next phase type
-			// set timeRemaining to length in timeControls
-			// increment phaseCount
-			// decrement timeControls[3]
+			phaseCount++;
+			let nextPhase = pickPhaseStateInstance(phaseCount);
+			timeRemaining = (this.state.timeControls[nextPhase] * 60000);
+			
+			// decrement interval after rest phase
+			if (phaseCount % 8 === 1) {
+				timeControls[3] = timeControls[3] - 1;
+			}
+			// console.log(timeControls, nextPhase, phaseCount);
+			if (phaseCount % 8 === 0 && timeControls[3] === 0) {
+				// trigger completion state
+				cancelAnimationFrame(this.state.frameRequestID);
+				this.setState({ phaseCount: phaseCount, timeRemaining: 0 });
+				return false;
+			}
 		}
+
 
 		this.setState({
 			refTime: t,
 			timeRemaining: timeRemaining,
-			frameRequestID: requestAnimationFrame(this.tick)
-			// update phase count if changed above
+			frameRequestID: requestAnimationFrame(this.tick),
+			phaseCount: phaseCount,
+			timeControls: timeControls
 		});
 	}
 
@@ -61,9 +84,10 @@ class KetchupTimer extends React.Component {
 	render() {
 
 		// set phase className based on phase count
+		const phaseModifier = phaseNames[pickPhaseStateInstance(this.state.phaseCount)];
 
 		return (
-			<section className="ketchup work">
+			<section className={ "ketchup " + phaseModifier }>
 				<div>
 					<TimeDisplay timeRemaining={this.state.timeRemaining}
 											 timeControls={this.state.timeControls}/>
@@ -103,33 +127,33 @@ class TimeControl extends React.Component {
 					W
 					<input className="global_light"
 								 type="number"
-								 min="0"
+								 min="1"
 								 max="99"
-								 defaultValue={('00' + this.props.timeControls[0]).substr(-2)}></input>
+								 value={('00' + this.props.timeControls[0]).substr(-2)}></input>
 				</label>
 				<label className="ketchup-timer_label break" title="break length in minutes">
 					B
 					<input className="global_light"
 								 type="number"
-								 min="0"
+								 min="1"
 								 max="99"
-								 defaultValue={('00' + this.props.timeControls[1]).substr(-2)}></input>
+								 value={('00' + this.props.timeControls[1]).substr(-2)}></input>
 				</label>
 				<label className="ketchup-timer_label rest" title="rest length in minutes">
 					R
 					<input className="global_light"
 								 type="number"
-								 min="0"
+								 min="1"
 								 max="99"
-								 defaultValue={('00' + this.props.timeControls[2]).substr(-2)}></input>
+								 value={('00' + this.props.timeControls[2]).substr(-2)}></input>
 				</label>
 				<label className="ketchup-timer_label left" title="number of intervals remaining">
 					L
 					<input className="global_light"
 								 type="number"
-								 min="0"
+								 min="1"
 								 max="99"
-								 defaultValue={('00' + this.props.timeControls[3]).substr(-2)}></input>
+								 value={('00' + this.props.timeControls[3]).substr(-2)}></input>
 				</label>
 			</div>
 		);
