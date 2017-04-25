@@ -7,7 +7,8 @@ function pickPhaseStateInstance(step) {
 	if (step % 8 === 0) return 2;
 }
 
-const phaseNames = ['work','break','rest'];
+const phaseNames = ['work','break','rest'],
+			targetNameMap = { "work": 0, "break": 1, "rest": 2, "left": 3 };
 
 class KetchupTimer extends React.Component {
 
@@ -16,7 +17,7 @@ class KetchupTimer extends React.Component {
 
 		// bind methods
 		this.tick = this.tick.bind(this);
-		// handleTimeControlChange
+		this.handleTimeControlChange = this.handleTimeControlChange.bind(this);
 
 		this.state = {
 			refTime: 0,
@@ -79,7 +80,24 @@ class KetchupTimer extends React.Component {
 		});
 	}
 
-	// handle timeControl change
+	handleTimeControlChange(e) {
+
+		let timeControls = [ ...this.state.timeControls ];
+
+		timeControls[targetNameMap[e.target.name]] = parseInt(e.target.value,10);
+
+		// important for performance why exactly? Don't stack frame requests?
+		cancelAnimationFrame(this.state.frameRequestID);
+
+		this.setState({
+			timeControls: timeControls,
+			phaseCount: 1,
+			refTime: Date.now(),
+			timeRemaining: (timeControls[0] * 60000),
+			frameRequestID: requestAnimationFrame(this.tick)
+		});
+
+	}
 
 	render() {
 
@@ -90,7 +108,8 @@ class KetchupTimer extends React.Component {
 			<section className={ "ketchup " + phaseModifier }>
 				<div>
 					<TimeDisplay timeRemaining={this.state.timeRemaining}
-											 timeControls={this.state.timeControls}/>
+											 timeControls={this.state.timeControls}
+											 handleTimeControlChange={this.handleTimeControlChange} />
 					<p className="ketchup-timer_title">ketchup timer <span>offbeat</span></p>
 				</div>
 			</section>
@@ -109,7 +128,8 @@ class TimeDisplay extends React.Component {
 		return (
 			<div className="ketchup-timer">
 				<p className="ketchup-timer_time">{minutes+":"+seconds+":"+milliseconds}</p>
-				<TimeControl timeControls={this.props.timeControls} />
+				<TimeControl timeControls={this.props.timeControls}
+										 handleTimeControlChange={this.props.handleTimeControlChange} />
 			</div>
 		);
 	}
@@ -127,33 +147,41 @@ class TimeControl extends React.Component {
 					W
 					<input className="global_light"
 								 type="number"
+								 name="work"
 								 min="1"
 								 max="99"
-								 value={('00' + this.props.timeControls[0]).substr(-2)}></input>
+								 value={('00' + this.props.timeControls[0]).substr(-2)}
+								 onChange={this.props.handleTimeControlChange}></input>
 				</label>
 				<label className="ketchup-timer_label break" title="break length in minutes">
 					B
 					<input className="global_light"
 								 type="number"
+								 name="break"
 								 min="1"
 								 max="99"
-								 value={('00' + this.props.timeControls[1]).substr(-2)}></input>
+								 value={('00' + this.props.timeControls[1]).substr(-2)}
+								 onChange={this.props.handleTimeControlChange}></input>
 				</label>
 				<label className="ketchup-timer_label rest" title="rest length in minutes">
 					R
 					<input className="global_light"
 								 type="number"
+								 name="rest"
 								 min="1"
 								 max="99"
-								 value={('00' + this.props.timeControls[2]).substr(-2)}></input>
+								 value={('00' + this.props.timeControls[2]).substr(-2)}
+								 onChange={this.props.handleTimeControlChange}></input>
 				</label>
 				<label className="ketchup-timer_label left" title="number of intervals remaining">
 					L
 					<input className="global_light"
 								 type="number"
+								 name="left"
 								 min="1"
 								 max="99"
-								 value={('00' + this.props.timeControls[3]).substr(-2)}></input>
+								 value={('00' + this.props.timeControls[3]).substr(-2)}
+								 onChange={this.props.handleTimeControlChange}></input>
 				</label>
 			</div>
 		);

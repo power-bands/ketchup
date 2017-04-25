@@ -85,6 +85,10 @@ body {
 	font-family: 'Jura';
 	transition: color 400ms ease-out; 
 }
+.ketchup-timer_label input:focus {
+	outline: 0;
+	text-decoration: underline;
+}
 .ketchup.work .ketchup-timer_label input { color: #f44336; }
 .ketchup.break .ketchup-timer_label input { color: #ffd54f; }
 .ketchup.rest .ketchup-timer_label input { color: #81d4fa; }
