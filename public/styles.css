@@ -16,7 +16,7 @@ body {
 	position: relative;
 	background-color: transparent;
 	width: 515px;
-	height: 90px;
+	height: 115px;
 	margin: 40px 0 0 40px;
 	border-radius: 5px;
 	text-align: center;
@@ -72,6 +72,14 @@ body {
 .ketchup-timer_label.break { top: 29px; }
 .ketchup-timer_label.rest { top: 47px; }
 .ketchup-timer_label.left { top: 65px; }
+.ketchup-timer_label.start {
+	display: inline-block;
+	width: 115px; 
+	left: 15px; right: auto;
+	line-height: 20px;
+	height: 20px;
+	text-align: left;
+}
 .ketchup-timer_label input {
 	width: 20px;
 	height: 16px;
@@ -85,6 +93,11 @@ body {
 	font-family: 'Jura';
 	transition: color 400ms ease-out; 
 }
+.ketchup-timer_label.start input { 
+	top: 2px;
+	width: 36px;
+	padding: 0 5px;
+}
 .ketchup-timer_label input:focus {
 	outline: 0;
 	text-decoration: underline;
@@ -93,9 +106,20 @@ body {
 .ketchup.break .ketchup-timer_label input { color: #ffd54f; }
 .ketchup.rest .ketchup-timer_label input { color: #81d4fa; }
 
+	
 input[type=number] { -moz-appearance: textfield; } 
 input[type=number]::-webkit-inner-spin-button, 
 input[type=number]::-webkit-outer-spin-button { 
 	-webkit-appearance: none; 
 	margin: 0; 
 }
+.ketchup-timer_extras {
+	position: absolute;
+	bottom: 0; left: 0;
+	height: 20px;
+	width: 100%; 
+	border-top: 4px solid #131313;
+	box-shadow: inset -3px 3px 2px rgba(0,90,130,0.25);
+}
+.ketchup-timer_extras-begin {}
+.ketchup-timer_extras-begin input {}
