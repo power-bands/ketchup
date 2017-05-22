@@ -7,12 +7,35 @@ function pickPhaseStateInstance(step) {
 	if (step % 8 === 0) return 2;
 }
 
+function getEpochMillisecondsFromTwentyFourHourTime(time) {
+
+	const targetTime = time.split(":").map((n) => parseInt(n,10)),
+				shouldIncrementDate = (new Date().getHours() > targetTime[0]) ? true : false,
+				newDateObj = (shouldIncrementDate) ? new Date(new Date().setDate( + 1 )) : new Date();
+
+	return (
+		new Date(newDateObj.getFullYear(),
+						 newDateObj.getMonth(),
+						 newDateObj.getDate(),
+						 targetTime[0],
+						 targetTime[1])
+			.getTime()
+	);
+
+}
+
+const TwentyFourHourTimeRegex = new RegExp(/(2[0-3]|[01][0-9]):([0-5][0-9])/);
+
 const phaseNames = ['work','break','rest'],
 			targetNameMap = { "work": 0, "break": 1, "rest": 2, "left": 3 };
 
 class KetchupTimer extends React.Component {
 
+
 	constructor(props) {
+
+		const currentDate = new Date();
+
 		super(props);
 
 		// bind methods
@@ -23,6 +46,7 @@ class KetchupTimer extends React.Component {
 			refTime: 0,
 			timeRemaining: 0,
 			phaseCount: 1,
+			startTime: currentDate.getHours()+":"+currentDate.getMinutes(),
 			timeControls: [
 				1,
 				1,
@@ -59,7 +83,7 @@ class KetchupTimer extends React.Component {
 			
 			// decrement interval after rest phase
 			if (phaseCount % 8 === 1) {
-				timeControls[3] = timeControls[3] - 1;
+				timeControls[3]--;
 			}
 			// console.log(timeControls, nextPhase, phaseCount);
 			if (phaseCount % 8 === 0 && timeControls[3] === 0) {
@@ -99,6 +123,11 @@ class KetchupTimer extends React.Component {
 
 	}
 
+	handleStartTimeChange(e) {
+		if (!TwentyFourHourTimeRegex.test(e.target.value)) return false;
+		// setTimeout grab date from the start at field
+	}
+
 	render() {
 
 		// set phase className based on phase count
@@ -109,6 +138,7 @@ class KetchupTimer extends React.Component {
 				<div>
 					<TimeDisplay timeRemaining={this.state.timeRemaining}
 											 timeControls={this.state.timeControls}
+											 startTime={this.state.startTime}
 											 handleTimeControlChange={this.handleTimeControlChange} />
 					<p className="ketchup-timer_title">ketchup timer <span>offbeat</span></p>
 				</div>
@@ -130,7 +160,10 @@ class TimeDisplay extends React.Component {
 				<p className="ketchup-timer_time">{minutes+":"+seconds+":"+milliseconds}</p>
 				<TimeControl timeControls={this.props.timeControls}
 										 handleTimeControlChange={this.props.handleTimeControlChange} />
+				<TimeExtras startTime={this.props.startTime}
+										handleStartTimeChange={this.props.handleStartTimeChange} />
 			</div>
+
 		);
 	}
 } 
@@ -186,7 +219,31 @@ class TimeControl extends React.Component {
 			</div>
 		);
 	}
-} 
+}
+
+class TimeExtras extends React.Component {
+
+	render() {
+
+		return (
+
+		<div className="ketchup-timer_extras">
+			<label className="ketchup-timer_label start">
+				START AT
+				<input className="global_light"
+							 type="text"
+							 name="work"
+							 min="1"
+							 max="99"
+							 value={this.props.startTime}
+							 onChange={this.props.handleStartTimeChange}></input>
+			</label>
+		</div>
+
+		);
+	}
+
+}
 
 ReactDOM.render(
 	<KetchupTimer />,
