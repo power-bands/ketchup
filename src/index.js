@@ -41,6 +41,7 @@ class KetchupTimer extends React.Component {
 		// bind methods
 		this.tick = this.tick.bind(this);
 		this.handleTimeControlChange = this.handleTimeControlChange.bind(this);
+		this.handleStartTimeChange = this.handleStartTimeChange.bind(this);
 
 		this.state = {
 			refTime: 0,
@@ -105,7 +106,8 @@ class KetchupTimer extends React.Component {
 
 	handleTimeControlChange(e) {
 
-		let timeControls = [ ...this.state.timeControls ];
+		let timeControls = [ ...this.state.timeControls ],
+				currentDate = new Date();
 
 		timeControls[targetNameMap[e.target.name]] = parseInt(e.target.value,10);
 
@@ -115,7 +117,8 @@ class KetchupTimer extends React.Component {
 		this.setState({
 			timeControls: timeControls,
 			phaseCount: 1,
-			refTime: Date.now(),
+			startTime: ('00'+currentDate.getHours()).substr(-2)+":"+('00'+currentDate.getMinutes()).substr(-2),
+			refTime: currentDate,
 			timeRemaining: (timeControls[0] * 60000),
 			frameRequestID: requestAnimationFrame(this.tick)
 		});
@@ -123,8 +126,27 @@ class KetchupTimer extends React.Component {
 	}
 
 	handleStartTimeChange(e) {
-		if (!TwentyFourHourTimeRegex.test(e.target.value)) return false;
-		// setTimeout grab date from the start at field
+		
+		if (!TwentyFourHourTimeRegex.test(e.target.value)) console.log('invalid time!');
+		
+		const providedTimeString = e.target.value,
+					nowEpochMilliseconds = new Date().getTime(),
+					targetEpochMilliseconds = getEpochMillisecondsFromTwentyFourHourTime(providedTimeString),
+					theTimeoutLength = targetEpochMilliseconds - nowEpochMilliseconds;
+		
+		cancelAnimationFrame(this.state.frameRequestID);
+
+		this.setState({
+			startTime: providedTimeString,
+			timeRemaining: 0
+		});
+
+		window.setTimeout(() => {
+			this.setState({
+				frameRequestID: requestAnimationFrame(this.tick)
+			});
+		}, theTimeoutLength);
+
 	}
 
 	render() {
@@ -138,7 +160,8 @@ class KetchupTimer extends React.Component {
 					<TimeDisplay timeRemaining={this.state.timeRemaining}
 											 timeControls={this.state.timeControls}
 											 startTime={this.state.startTime}
-											 handleTimeControlChange={this.handleTimeControlChange} />
+											 handleTimeControlChange={this.handleTimeControlChange}
+											 handleStartTimeChange={this.handleStartTimeChange} />
 					<p className="ketchup-timer_title">ketchup timer <span>offbeat</span></p>
 				</div>
 			</section>
@@ -231,9 +254,7 @@ class TimeExtras extends React.Component {
 				START AT
 				<input className="global_light"
 							 type="text"
-							 name="work"
-							 min="1"
-							 max="99"
+							 name="startTime"
 							 value={this.props.startTime}
 							 onChange={this.props.handleStartTimeChange}></input>
 			</label>
