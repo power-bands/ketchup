@@ -46,7 +46,7 @@ class KetchupTimer extends React.Component {
 			refTime: 0,
 			timeRemaining: 0,
 			phaseCount: 1,
-			startTime: currentDate.getHours()+":"+currentDate.getMinutes(),
+			startTime: ('00'+currentDate.getHours()).substr(-2)+":"+('00'+currentDate.getMinutes()).substr(-2),
 			timeControls: [
 				1,
 				1,
@@ -70,10 +70,10 @@ class KetchupTimer extends React.Component {
 	tick() {
 
 		let t = Date.now(),
-					diff = (t - this.state.refTime),
-					timeRemaining = (this.state.timeRemaining - diff),
-					timeControls = [ ...this.state.timeControls ],
-					phaseCount = this.state.phaseCount;
+				diff = (t - this.state.refTime),
+				timeRemaining = (this.state.timeRemaining - diff),
+				timeControls = [ ...this.state.timeControls ],
+				phaseCount = this.state.phaseCount;
 		
 		// handle phase change
 		if (timeRemaining <= 0) {
@@ -93,7 +93,6 @@ class KetchupTimer extends React.Component {
 				return false;
 			}
 		}
-
 
 		this.setState({
 			refTime: t,
