@@ -54,7 +54,8 @@ class KetchupTimer extends React.Component {
 				1,
 				1
 			],
-			frameRequestID: 0
+			frameRequestID: 0,
+			timeoutTick: 0
 		};
 	}
 
@@ -111,41 +112,46 @@ class KetchupTimer extends React.Component {
 
 		timeControls[targetNameMap[e.target.name]] = parseInt(e.target.value,10);
 
-		// important for performance why exactly? Don't stack frame requests?
 		cancelAnimationFrame(this.state.frameRequestID);
 
 		this.setState({
 			timeControls: timeControls,
-			phaseCount: 1,
+			phaseCount: 0,
 			startTime: ('00'+currentDate.getHours()).substr(-2)+":"+('00'+currentDate.getMinutes()).substr(-2),
 			refTime: currentDate,
 			timeRemaining: (timeControls[0] * 60000),
-			frameRequestID: requestAnimationFrame(this.tick)
+			frameRequestID: (Boolean(this.state.timeoutTick)) ?  0 : requestAnimationFrame(this.tick)
 		});
 
 	}
 
 	handleStartTimeChange(e) {
+
+		if (!TwentyFourHourTimeRegex.test(e.target.value)) {
+			e.target.value = this.state.startTime;
+			return false;
+		}
 		
-		if (!TwentyFourHourTimeRegex.test(e.target.value)) console.log('invalid time!');
-		
-		const providedTimeString = e.target.value,
-					nowEpochMilliseconds = new Date().getTime(),
+		const nowEpochMilliseconds = new Date().getTime(),
+					providedTimeString = e.target.value,
 					targetEpochMilliseconds = getEpochMillisecondsFromTwentyFourHourTime(providedTimeString),
 					theTimeoutLength = targetEpochMilliseconds - nowEpochMilliseconds;
 		
 		cancelAnimationFrame(this.state.frameRequestID);
 
-		this.setState({
-			startTime: providedTimeString,
-			timeRemaining: 0
-		});
-
-		window.setTimeout(() => {
+		const timeoutTick = window.setTimeout(() => {
 			this.setState({
-				frameRequestID: requestAnimationFrame(this.tick)
+				frameRequestID: requestAnimationFrame(this.tick),
+				timeoutTick: 0
 			});
 		}, theTimeoutLength);
+
+		this.setState({
+			startTime: providedTimeString,
+			timeRemaining: 0,
+			phaseCount: 0,
+			timeoutTick: timeoutTick
+		});
 
 	}
 
@@ -255,8 +261,8 @@ class TimeExtras extends React.Component {
 				<input className="global_light"
 							 type="text"
 							 name="startTime"
-							 value={this.props.startTime}
-							 onChange={this.props.handleStartTimeChange}></input>
+							 defaultValue={this.props.startTime}
+							 onBlur={this.props.handleStartTimeChange}></input>
 			</label>
 		</div>
 
