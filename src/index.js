@@ -84,7 +84,7 @@ class KetchupTimer extends React.Component {
 			timeRemaining = (this.state.timeControls[nextPhase] * 60000);
 			
 			// decrement interval after rest phase
-			if (phaseCount % 8 === 1) {
+			if (phaseCount > 1 && phaseCount % 8 === 1) {
 				timeControls[3]--;
 			}
 			// console.log(timeControls, nextPhase, phaseCount);
@@ -108,7 +108,8 @@ class KetchupTimer extends React.Component {
 	handleTimeControlChange(e) {
 
 		let timeControls = [ ...this.state.timeControls ],
-				currentDate = new Date();
+				currentDate = new Date(),
+				theStartTime = (Boolean(this.state.timeoutTick)) ? this.state.startTime : ('00'+currentDate.getHours()).substr(-2)+":"+('00'+currentDate.getMinutes()).substr(-2);
 
 		timeControls[targetNameMap[e.target.name]] = parseInt(e.target.value,10);
 
@@ -116,29 +117,32 @@ class KetchupTimer extends React.Component {
 
 		this.setState({
 			timeControls: timeControls,
-			phaseCount: 0,
-			startTime: ('00'+currentDate.getHours()).substr(-2)+":"+('00'+currentDate.getMinutes()).substr(-2),
+			phaseCount: 1,
+			startTime: theStartTime,
 			refTime: currentDate,
 			timeRemaining: (timeControls[0] * 60000),
 			frameRequestID: (Boolean(this.state.timeoutTick)) ?  0 : requestAnimationFrame(this.tick)
 		});
 
+		document.querySelector('input[name=startTime]').value = theStartTime;
+
 	}
 
 	handleStartTimeChange(e) {
-
+		
 		if (!TwentyFourHourTimeRegex.test(e.target.value)) {
 			e.target.value = this.state.startTime;
 			return false;
 		}
-		
+
 		const nowEpochMilliseconds = new Date().getTime(),
 					providedTimeString = e.target.value,
 					targetEpochMilliseconds = getEpochMillisecondsFromTwentyFourHourTime(providedTimeString),
 					theTimeoutLength = targetEpochMilliseconds - nowEpochMilliseconds;
-		
-		cancelAnimationFrame(this.state.frameRequestID);
 
+		cancelAnimationFrame(this.state.frameRequestID);
+		if (this.state.timeoutTick) clearTimeout(this.state.timeoutTick);
+		
 		const timeoutTick = window.setTimeout(() => {
 			this.setState({
 				frameRequestID: requestAnimationFrame(this.tick),
@@ -148,8 +152,8 @@ class KetchupTimer extends React.Component {
 
 		this.setState({
 			startTime: providedTimeString,
-			timeRemaining: 0,
-			phaseCount: 0,
+			timeRemaining: (this.state.timeControls[0] * 60000),
+			phaseCount: 1,
 			timeoutTick: timeoutTick
 		});
 
@@ -166,6 +170,7 @@ class KetchupTimer extends React.Component {
 					<TimeDisplay timeRemaining={this.state.timeRemaining}
 											 timeControls={this.state.timeControls}
 											 startTime={this.state.startTime}
+											 timeoutTick={this.state.timeoutTick}
 											 handleTimeControlChange={this.handleTimeControlChange}
 											 handleStartTimeChange={this.handleStartTimeChange} />
 					<p className="ketchup-timer_title">ketchup timer <span>offbeat</span></p>
@@ -181,11 +186,12 @@ class TimeDisplay extends React.Component {
 
 		const	minutes = ('000' + (Math.floor(this.props.timeRemaining / 60000))).substr(-2),
 		 			seconds = ('000' + (Math.floor((this.props.timeRemaining % 60000) / 1000))).substr(-2),
-					milliseconds = ('000' + (this.props.timeRemaining % 60000 % 1000)).substr(-3);
+					milliseconds = ('000' + (this.props.timeRemaining % 60000 % 1000)).substr(-3),
+					blinking = (this.props.timeRemaining <= 0 || this.props.timeoutTick) ? ' blink' : '';
 
 		return (
 			<div className="ketchup-timer">
-				<p className="ketchup-timer_time">{minutes+":"+seconds+":"+milliseconds}</p>
+				<p className={"ketchup-timer_time"+blinking}>{minutes+":"+seconds+":"+milliseconds}</p>
 				<TimeControl timeControls={this.props.timeControls}
 										 handleTimeControlChange={this.props.handleTimeControlChange} />
 				<TimeExtras startTime={this.props.startTime}
